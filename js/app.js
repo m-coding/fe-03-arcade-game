@@ -105,7 +105,7 @@ function defaultOptions() {
     debugMode = false;
     off.checked = true;
     clearFocus();
-}// defaultOptions
+} // defaultOptions
 
 /**
  * Updates player item info on side canvas
