@@ -1,0 +1,68 @@
+body {
+    text-align: center;
+    background-color: #fcf1db;
+    font-family: Verdana, Arial, Helvetica, Sans-serif;
+    font-size: 14px;
+}
+
+header {
+    width: 707px;
+    margin: 0 auto;
+}
+
+section {
+    position: relative;
+    width: 505px;
+    margin: 25px auto 25px auto;
+    padding-right: 202px;
+    display: flex;
+    text-align: left;
+}
+
+footer {
+    position: relative;
+    width: 707px;
+    margin: 0 auto;
+    text-align: left;
+    font-size: 90%;
+}
+
+h1 {
+    font-style: italic;
+    text-align: left;
+}
+
+h4 {
+    display: inline;
+}
+
+#canvasContainer {
+    position: relative;
+    width: 707px;
+    height: 606px;
+    margin: 0 auto;
+}
+
+#gameboard {
+    z-index: 0;
+    position: absolute;
+    margin-right: 202px;
+    left: 0;
+}
+
+#gameboardinfo {
+    z-index: 1;
+    position: absolute;
+    right: 0;
+}
+
+#gamedifficulty {
+    position: relative;
+    width: 252px;
+}
+
+#debug {
+    position: relative;
+    width: 252px;
+    text-align: right;
+}
