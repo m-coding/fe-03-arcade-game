@@ -8,68 +8,71 @@
 /* GLOBAL VARIABLES
 ----------------------------------*/
 
-var allItems = [];
-var allEnemies = [];
-var enemyW = 101;
-var enemyH = 48;
-var enemyTopOffset = 72;
-var enemyLeftOffset = 0;
-var playerW = 82;
-var playerH = 88;
-var playerTopOffset = 51;
-var playerLeftOffset = 10;
-var tileW = 101;
-var tileH = 83;
-var gameWon = false;
-var gameOver = false;
-var gameEasy = true;
-var itemsConfig = [
-    // [item, x, y] reminder: numbering starts with 0 and not 1
-    ['heart', 2, 2], // 3rd col 3rd row
-    ['heart', 4, 3], // 5th col 4th row
-    ['shell', 1, 0], // 2nd col 1st row
-    ['shell', 3, 1], // 4th col 2nd row
-    ['shell', 0, 2], // 1st col 3rd row
-    ['shell', 3, 3], // 4th col 4th row
-    ['shell', 1, 4]  // 2nd col 5th row
-];
-var player;
-var enemy;
+// object literal to hold global vars
+var app = {
+    CANVAS_WIDTH: 505,
+    CANVAS_HEIGHT: 606,
+    allItems: [],
+    allEnemies: [],
+    ENEMY_WIDTH: 101,
+    ENEMY_HEIGHT: 48,
+    ENEMY_TOP_OFFSET: 72,
+    ENEMY_LEFT_OFFSET: 0,
+    PLAYER_WIDTH: 82,
+    PLAYER_HEIGHT: 88,
+    PLAYER_TOP_OFFSET: 51,
+    PLAYER_LEFT_OFFSET: 10,
+    TILE_WIDTH: 101,
+    TILE_HEIGHT: 83,
+    gameWon: false,
+    gameOver: false,
+    gameEasy: true,
+    itemsConfig: [
+        // [item, x, y] reminder: numbering starts with 0 and not 1
+        ['heart', 2, 2], // 3rd col 3rd row
+        ['heart', 4, 3], // 5th col 4th row
+        ['shell', 1, 0], // 2nd col 1st row
+        ['shell', 3, 1], // 4th col 2nd row
+        ['shell', 0, 2], // 1st col 3rd row
+        ['shell', 3, 3], // 4th col 4th row
+        ['shell', 1, 4]  // 2nd col 5th row
+    ],
+    player: {},
+    enemy: {},
+    debugMode: false,
+    on: document.getElementById('on'),
+    off: document.getElementById('off'),
+    easy: document.getElementById('easy'),
+    hard: document.getElementById('hard')
+};
 
 /* DEBUG (show/hide box overlays)
 ----------------------------------*/
 
-var debugMode = false;
-var on = document.getElementById('on');
-var off = document.getElementById('off');
-
-on.addEventListener('click', function(e) {
-    debugMode = true;
+app.on.addEventListener('click', function(e) {
+    app.debugMode = true;
     clearFocus();
 });
 
-off.addEventListener('click', function(e) {
-    debugMode = false;
+app.off.addEventListener('click', function(e) {
+    app.debugMode = false;
     clearFocus();
 });
 
 /* GAME DIFFICULTY
 ----------------------------------*/
 
-var easy = document.getElementById('easy');
-var hard = document.getElementById('hard');
-
-easy.addEventListener('click', function(e) {
-    gameEasy = true;
+app.easy.addEventListener('click', function(e) {
+    app.gameEasy = true;
     clearFocus();
-    player.reset();
+    app.player.reset();
     newGame();
 });
 
-hard.addEventListener('click', function(e) {
-    gameEasy = false;
+app.hard.addEventListener('click', function(e) {
+    app.gameEasy = false;
     clearFocus();
-    player.reset();
+    app.player.reset();
     newGame();
 });
 
@@ -100,10 +103,10 @@ function clearFocus() {
  * Resets game difficulty to 'easy' and debug mode to 'off'
  */
 function defaultOptions() {
-    gameEasy = true;
-    easy.checked = true;
-    debugMode = false;
-    off.checked = true;
+    app.gameEasy = true;
+    app.easy.checked = true;
+    app.debugMode = false;
+    app.off.checked = true;
     clearFocus();
 } // defaultOptions
 
@@ -131,21 +134,21 @@ function updateSideCanvasText(type, text) {
  * Draws winner screen
  */
 function wonGame() {
-    gameWon = true;
-    allItems = [];
-    allEnemies = [];
-    ctx.clearRect(0, 0, canvasW, canvasH);
+    app.gameWon = true;
+    app.allItems = [];
+    app.allEnemies = [];
+    ctx.clearRect(0, 0, app.CANVAS_WIDTH, app.CANVAS_HEIGHT);
     ctx.beginPath();
-    ctx.rect(0, 0, canvasW, canvasH);
+    ctx.rect(0, 0, app.CANVAS_WIDTH, app.CANVAS_HEIGHT);
     ctx.fillStyle = '#fff'; // orange overlay
     ctx.fill();
     ctx.closePath();
     ctx.font = 'bold 36px Verdana, Arial, Helvetica, Sans-serif';
     ctx.fillStyle = '#000';
     ctx.fillText('You are a Winner!!!', 62, 202);
-    ctx.drawImage(Resources.get('images/winner.png'), 12, canvasH - 202);
+    ctx.drawImage(Resources.get('images/winner.png'), 12, app.CANVAS_HEIGHT - 202);
     ctx.font = 'bold 18px Verdana, Arial, Helvetica, Sans-serif';
-    ctx.fillText('PRESS SPACE TO PLAY AGAIN', 100, canvasH - 30);
+    ctx.fillText('PRESS SPACE TO PLAY AGAIN', 100, app.CANVAS_HEIGHT - 30);
 } // wonGame
 
 /**
@@ -153,41 +156,41 @@ function wonGame() {
  */
 function newGame() {
     // Items
-    for(var h = 0; h < itemsConfig.length; h++) {
-        var item = itemsConfig[h];
+    for(var h = 0; h < app.itemsConfig.length; h++) {
+        var item = app.itemsConfig[h];
 
         for(var i = 0; i < item.length; i++) {
             if(item[i] == 'heart') {
-                var heartX = item[i+1] * tileW;
-                var heartY = item[i+2] * tileH;
+                var heartX = item[i+1] * app.TILE_WIDTH;
+                var heartY = item[i+2] * app.TILE_HEIGHT;
                 var heart = new Item(heartX, heartY, 45, 45, 30, 70, item[i]);
-                allItems.push(heart);
+                app.allItems.push(heart);
                 break; // jump out of the loop
             } // if heart
 
             if(item[i] == 'shell') {
-                var shellX = item[i+1] * tileW;
-                var shellY = item[i+2] * tileH;
+                var shellX = item[i+1] * app.TILE_WIDTH;
+                var shellY = item[i+2] * app.TILE_HEIGHT;
                 var shell = new Item(shellX, shellY, 54, 54, 26, 64, item[i]);
-                allItems.push(shell);
+                app.allItems.push(shell);
                 break; // jump out of the loop
             } // if shell
 
         } // for item
-    } // for itemsConfig
+    } // for app.itemsConfig
 
     // Player
-    player = new Player();
+    app.player = new Player();
 
     // Enemies
     for(var e = -1; e < 4; e++) {
-        var enemyX = tileW * -1;
-        var enemyY = (tileH * (e + 1)); // rows 1-4
+        var enemyX = app.TILE_WIDTH * -1;
+        var enemyY = (app.TILE_HEIGHT * (e + 1)); // rows 1-4
         var enemyS = getRandomIntInclusive(100,300);
-        if(gameEasy && e === 0) enemyS = 0;  // no enemy
-        if(gameEasy && e === 3) enemyS = 50; // slow enemy
-        enemy = new Enemy(enemyX, enemyY, enemyS);
-        allEnemies.push(enemy);
+        if(app.gameEasy && e === 0) enemyS = 0;  // no enemy
+        if(app.gameEasy && e === 3) enemyS = 50; // slow enemy
+        app.enemy = new Enemy(enemyX, enemyY, enemyS);
+        app.allEnemies.push(app.enemy);
     }
 
 } // newGame
@@ -250,7 +253,7 @@ Item.prototype.update = function(dt) {
 Item.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 
-    if(debugMode) {
+    if(app.debugMode) {
         ctx.beginPath();
         ctx.rect(this.left, this.top, this.width, this.height);
         ctx.fillStyle = 'rgba(0, 0, 255, 0.5)'; // blue overlay
@@ -276,10 +279,10 @@ var Enemy = function(x,y,s) {
     this.isColliding = false;
 
     // bounding box (used in collision detection algorithm)
-    this.left = this.x + enemyLeftOffset; // x
-    this.top = this.y + enemyTopOffset;  // y
-    this.right = this.left + enemyW; // x + width
-    this.bottom = this.top + enemyH; // y + height
+    this.left = this.x + app.ENEMY_LEFT_OFFSET; // x
+    this.top = this.y + app.ENEMY_TOP_OFFSET;  // y
+    this.right = this.left + app.ENEMY_WIDTH; // x + width
+    this.bottom = this.top + app.ENEMY_HEIGHT; // y + height
 };
 
 /**
@@ -294,26 +297,26 @@ Enemy.prototype.update = function(dt) {
     // if colliding freeze movement
     if(!this.isColliding) this.x = this.x + (dt * this.speed);
     this.y = this.y;
-    this.left = this.x + enemyLeftOffset;
-    this.top = this.y + enemyTopOffset;
-    this.right = this.left + enemyW;
-    this.bottom = this.top + enemyH;
+    this.left = this.x + app.ENEMY_LEFT_OFFSET;
+    this.top = this.y + app.ENEMY_TOP_OFFSET;
+    this.right = this.left + app.ENEMY_WIDTH;
+    this.bottom = this.top + app.ENEMY_HEIGHT;
     this.sprite = this.spriteStart;
 
     // if enemy is off the canvas, then reset position
-    if(this.x > canvasW) {
+    if(this.x > app.CANVAS_WIDTH) {
         // reset position by one tile off screen
-        this.x = (tileW * -1) + (dt * this.speed);
+        this.x = (app.TILE_WIDTH * -1) + (dt * this.speed);
     }
 
     // check for any collisions with the player
-    this.isColliding = this.playerCollision(player);
+    this.isColliding = this.playerCollision(app.player);
 
     // change enemy sprite
     if(this.isColliding) this.sprite = this.spriteHit;
 
     // call player hit method only when not currently being hit
-    if(this.isColliding && !player.hit) player.gotHit();
+    if(this.isColliding && !app.player.hit) app.player.gotHit();
 };
 
 /**
@@ -323,9 +326,12 @@ Enemy.prototype.update = function(dt) {
 Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 
-    if(debugMode) {
+    if(app.debugMode) {
         ctx.beginPath();
-        ctx.rect(this.x + enemyLeftOffset, this.y + enemyTopOffset, enemyW, enemyH);
+        ctx.rect(this.x + app.ENEMY_LEFT_OFFSET,
+                 this.y + app.ENEMY_TOP_OFFSET,
+                 app.ENEMY_WIDTH,
+                 app.ENEMY_HEIGHT);
         ctx.fillStyle = 'rgba(0, 255, 0, 0.5)'; // green overlay
         ctx.fill();
         ctx.closePath();
@@ -365,8 +371,8 @@ var Player = function() {
     this.spriteItem = 'images/girl-bubble-shell.png';
     this.displayImage = 'Start';
     this.displayTimer = 0;
-    this.startX = 4 * tileW; // start in the 5th column
-    this.startY = 5 * tileH; // start in the 6th row
+    this.startX = 4 * app.TILE_WIDTH; // start in the 5th column
+    this.startY = 5 * app.TILE_HEIGHT; // start in the 6th row
     this.x = this.startX;
     this.y = this.startY;
     this.rate = 0;
@@ -375,15 +381,14 @@ var Player = function() {
     this.shells = 0;
 
     // bounding box (used in collision detection algorithm)
-    this.left = this.x + playerLeftOffset; // x
-    this.top = this.y + playerTopOffset;  // y
-    this.right = this.left + playerW; // x + width
-    this.bottom = this.top + playerH; // y + height
+    this.left = this.x + app.PLAYER_LEFT_OFFSET; // x
+    this.top = this.y + app.PLAYER_TOP_OFFSET;  // y
+    this.right = this.left + app.PLAYER_WIDTH; // x + width
+    this.bottom = this.top + app.PLAYER_HEIGHT; // y + height
 };
 
 /**
  * Resets player, clears items, and enemies
- * @return {[type]} [description]
  */
 Player.prototype.reset = function() {
     this.x = this.startX;
@@ -394,8 +399,8 @@ Player.prototype.reset = function() {
     this.displayTimer = 0;
     this.lives = 1;
     this.shells = 0;
-    allItems = [];
-    allEnemies = [];
+    app.allItems = [];
+    app.allEnemies = [];
 };
 
 /**
@@ -414,22 +419,22 @@ Player.prototype.restart = function() {
     if(this.lives === 0) {
         this.lives = 1;
         this.shells = 0;
-        gameOver = true;
-        allItems = [];
-        allEnemies = [];
+        app.gameOver = true;
+        app.allItems = [];
+        app.allEnemies = [];
         ctx.beginPath();
-        ctx.rect(0, 0, canvasW, canvasH);
+        ctx.rect(0, 0, app.CANVAS_WIDTH, app.CANVAS_HEIGHT);
         ctx.fillStyle = 'rgba(252, 154, 36, 1)'; // orange overlay
         ctx.fill();
         ctx.closePath();
         ctx.font = 'bold 36px Verdana, Arial, Helvetica, Sans-serif';
         ctx.fillStyle = '#fff';
-        ctx.fillText('GAME OVER', 140, canvasH / 2);
+        ctx.fillText('GAME OVER', 140, app.CANVAS_HEIGHT / 2);
 
         // Display game over text for 3 seconds
         setTimeout( function() {
-            ctx.clearRect(0, 0, canvasW, canvasH);
-            gameOver = false;
+            ctx.clearRect(0, 0, app.CANVAS_WIDTH, app.CANVAS_HEIGHT);
+            app.gameOver = false;
             newGame();
         }, 3000);
     } // if zero lives
@@ -445,10 +450,10 @@ Player.prototype.update = function(dt) {
     this.rate = dt * 4;
 
     // Update player bounding box
-    this.left = this.x + playerLeftOffset;
-    this.top = this.y + playerTopOffset;
-    this.right = this.left + playerW;
-    this.bottom = this.top + playerH;
+    this.left = this.x + app.PLAYER_LEFT_OFFSET;
+    this.top = this.y + app.PLAYER_TOP_OFFSET;
+    this.right = this.left + app.PLAYER_WIDTH;
+    this.bottom = this.top + app.PLAYER_HEIGHT;
 
     // Use default player sprite
     this.sprite = this.spriteStart;
@@ -498,9 +503,12 @@ Player.prototype.render = function() {
         wonGame();
     }
 
-    if(debugMode) {
+    if(app.debugMode) {
         ctx.beginPath();
-        ctx.rect(this.x + playerLeftOffset, this.y + playerTopOffset, playerW, playerH);
+        ctx.rect(this.x + app.PLAYER_LEFT_OFFSET,
+                 this.y + app.PLAYER_TOP_OFFSET,
+                 app.PLAYER_WIDTH,
+                 app.PLAYER_HEIGHT);
         ctx.fillStyle = 'rgba(255, 255, 0, 0.5)'; // yellow overlay
         ctx.fill();
         ctx.closePath();
@@ -508,9 +516,9 @@ Player.prototype.render = function() {
 };
 
 /**
- * Handles arrow key inputs
+ * Handles keyboard inputs
  * @memberOf Player
- * @param  {string} k - Keycode of input
+ * @param {string} k - Keycode of input
  */
 Player.prototype.handleInput = function(k) {
     switch(k) {
@@ -520,8 +528,8 @@ Player.prototype.handleInput = function(k) {
         case 'up': this.moveUp(); break;
         case 'down': this.moveDown(); break;
         case 'spacebar':
-            if(gameWon) {
-                gameWon = false;
+            if(app.gameWon) {
+                app.gameWon = false;
                 this.reset();
                 newGame();
             }
@@ -536,7 +544,7 @@ Player.prototype.handleInput = function(k) {
  */
 Player.prototype.moveLeft = function() {
     if(this.x > 0 && !this.hit) {
-        this.x -= this.rate * tileW;
+        this.x -= this.rate * app.TILE_WIDTH;
     }
 };
 
@@ -547,8 +555,8 @@ Player.prototype.moveLeft = function() {
  */
 Player.prototype.moveRight = function() {
     // stop player when canvas width minus one tile width
-    if (this.x < (canvasW - tileW) && !this.hit) {
-        this.x += this.rate * tileW;
+    if (this.x < (app.CANVAS_WIDTH - app.TILE_WIDTH) && !this.hit) {
+        this.x += this.rate * app.TILE_WIDTH;
     }
 };
 
@@ -559,7 +567,7 @@ Player.prototype.moveRight = function() {
  */
 Player.prototype.moveUp = function() {
     if(this.y > -8 && !this.hit) {
-        this.y -= this.rate * tileH;
+        this.y -= this.rate * app.TILE_HEIGHT;
     }
 };
 
@@ -570,7 +578,7 @@ Player.prototype.moveUp = function() {
  */
 Player.prototype.moveDown = function() {
     if(this.y < 432 && !this.hit) {
-        this.y += this.rate * tileH;
+        this.y += this.rate * app.TILE_HEIGHT;
     }
 };
 
@@ -603,8 +611,8 @@ Player.prototype.gotHit = function() {
  * @memberOf Player
  */
 Player.prototype.itemCollision = function() {
-    for (var i = 0; i < allItems.length; i++) {
-        var item = allItems[i];
+    for (var i = 0; i < app.allItems.length; i++) {
+        var item = app.allItems[i];
 
         // bounding box collision test
         var outsideBottom = this.bottom <= item.top;
@@ -615,7 +623,7 @@ Player.prototype.itemCollision = function() {
 
         if (boxIntersect) {
             // remove the item
-            allItems.splice(i,1);
+            app.allItems.splice(i,1);
 
             // change sprite to player holding item collected
             this.gotItem(item.item);
@@ -660,7 +668,7 @@ document.addEventListener('keyup', function(e) {
         40: 'stop'
     };
 
-    player.handleInput(allowedKeys[e.keyCode]);
+    app.player.handleInput(allowedKeys[e.keyCode]);
 }); // document.addEventListener keyup
 
 /**
@@ -678,7 +686,7 @@ document.addEventListener('keydown', function(e) {
         40: 'down'
     };
 
-    player.handleInput(allowedKeys[e.keyCode]);
+    app.player.handleInput(allowedKeys[e.keyCode]);
 }); // document.addEventListener keydown
 
 /* INSTANTIATE OBJECTS

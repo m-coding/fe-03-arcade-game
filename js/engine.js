@@ -33,8 +33,8 @@ var Engine = (function(global) {
         sideCtx = sideCanvas.getContext('2d'),
         lastTime;
 
-    canvas.width = 505;
-    canvas.height = 606;
+    canvas.width = app.CANVAS_WIDTH;
+    canvas.height = app.CANVAS_HEIGHT;
     canvas.id = 'gameboard';
     doc.getElementById('canvasContainer').appendChild(canvas);
 
@@ -60,7 +60,7 @@ var Engine = (function(global) {
         /* Call our update/render functions, pass along the time delta to
          * our update function since it may be used for smooth animation.
          */
-        if(!gameOver) {
+        if(!app.gameOver) {
             update(dt);
             render();
         }
@@ -98,11 +98,11 @@ var Engine = (function(global) {
      * player object.
      */
     function updateEntities(dt) {
-        player.update(dt);
-        allItems.forEach(function(item) {
+        app.player.update(dt);
+        app.allItems.forEach(function(item) {
             item.update(dt);
         });
-        allEnemies.forEach(function(enemy) {
+        app.allEnemies.forEach(function(enemy) {
             enemy.update(dt);
         });
     }
@@ -130,7 +130,7 @@ var Engine = (function(global) {
             row, col;
 
         // Draw over the side canvas
-        if(debugMode) {
+        if(app.debugMode) {
             sideCtx.beginPath();
             sideCtx.rect(0, 0, 202, canvas.height);
             sideCtx.fillStyle = 'rgba(204, 204, 204, 1)'; // gray overlay
@@ -139,7 +139,7 @@ var Engine = (function(global) {
             sideCtx.font = '16px Arial, Helvetica, Sans-serif';
             sideCtx.fillStyle = '#ff0000';
             sideCtx.fillText('Canvas ID: gameboardinfo', 8, 20);
-        } // if debugMode
+        } // if app.debugMode
         else {
             sideCtx.beginPath();
             sideCtx.rect(0, 0, 202, canvas.height);
@@ -194,7 +194,7 @@ var Engine = (function(global) {
         ctx.drawImage(Resources.get('images/coral10.png'), 308, 372);
 
         // Draw over the main canvas
-        if(debugMode) {
+        if(app.debugMode) {
             ctx.beginPath();
             ctx.rect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = 'rgba(255, 204, 204, 0.5)'; // pink overlay
@@ -213,15 +213,15 @@ var Engine = (function(global) {
      * on your enemy and player entities within app.js
      */
     function renderEntities() {
-        allItems.forEach(function(item) {
+        app.allItems.forEach(function(item) {
             item.render();
         });
 
-        allEnemies.forEach(function(enemy) {
+        app.allEnemies.forEach(function(enemy) {
             enemy.render();
         });
 
-        player.render();
+        app.player.render();
     }
 
     /* Go ahead and load all of the images we know we're going to need to
@@ -263,6 +263,4 @@ var Engine = (function(global) {
      */
     global.ctx = ctx;
     global.sideCtx = sideCtx;
-    global.canvasW = canvas.width;
-    global.canvasH = canvas.height;
 })(this);
